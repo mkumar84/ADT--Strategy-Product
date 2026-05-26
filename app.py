@@ -802,43 +802,44 @@ with tabs[1]:
     )
     fig_g.update_layout(
         plot_bgcolor="white", paper_bgcolor="white",
-        legend=dict(orientation="h", y=1.06, x=0),
-        margin=dict(l=0,r=20,t=40,b=20),
+        showlegend=False,                        # pills above the chart already show this
+        margin=dict(l=0, r=20, t=28, b=55),     # extra bottom room for legend row
         xaxis=dict(showgrid=True, gridcolor="#F0F0F0",
-                   tickformat="%b %Y", dtick="M3"),
+                   tickformat="%b '%y", dtick="M3",
+                   tickfont=dict(size=10, color="#6B7280")),
         yaxis=dict(tickfont=dict(size=10.5)),
         font=dict(family="Inter"),
     )
-    # RBC fiscal quarters: Q1=Nov-Jan, Q2=Feb-Apr, Q3=May-Jul, Q4=Aug-Oct
+    # RBC fiscal-quarter divider lines only — no annotations at the top
     for yr in [2023, 2024, 2025, 2026, 2027]:
-        for m, qlabel in [(2, "Q2"), (5, "Q3"), (8, "Q4"), (11, "Q1")]:
-            fy = yr + 1 if m == 11 else yr
+        for m in [2, 5, 8, 11]:               # Feb=Q2, May=Q3, Aug=Q4, Nov=Q1
             fig_g.add_vline(
                 x=f"{yr}-{m:02d}-01", line_dash="dot",
-                line_color="#E5E7EB", line_width=1,
-            )
-            fig_g.add_annotation(
-                x=f"{yr}-{m:02d}-01", y=1.01,
-                xref="x", yref="paper",
-                text=f"{qlabel} FY{str(fy)[2:]}",
-                showarrow=False,
-                font=dict(size=8, color="#9CA3AF", family="Inter"),
-                bgcolor="rgba(0,0,0,0)",
-                borderpad=0,
+                line_color="#D1D5DB", line_width=1,
             )
     st.plotly_chart(fig_g, use_container_width=True)
 
+    # Status legend + FY key — one clean bar below the chart
+    status_chips = "".join(
+        f'<span style="display:inline-flex;align-items:center;gap:.3rem;margin-right:.9rem">'
+        f'<span style="width:10px;height:10px;border-radius:50%;background:{c};flex-shrink:0"></span>'
+        f'<span>{s}</span></span>'
+        for s, c in STATUS_CLR.items()
+    )
     st.markdown(
-        '<div style="background:white;border-radius:10px;padding:.65rem 1.2rem;'
-        'box-shadow:0 1px 5px rgba(0,0,0,.06);font-size:.8rem;color:#6B7280;'
-        'display:flex;align-items:center;gap:1.2rem;margin-top:.4rem;flex-wrap:wrap">'
-        '&#128197;&nbsp;<strong style="color:#003168">RBC Fiscal Year&nbsp;Nov&ndash;Oct</strong>'
-        '&nbsp;&nbsp;&bull;&nbsp;&nbsp;'
-        '<span><strong style="color:#003168">Q1</strong>&nbsp;Nov&ndash;Jan</span>'
-        '&nbsp;&nbsp;<span><strong style="color:#003168">Q2</strong>&nbsp;Feb&ndash;Apr</span>'
-        '&nbsp;&nbsp;<span><strong style="color:#003168">Q3</strong>&nbsp;May&ndash;Jul</span>'
-        '&nbsp;&nbsp;<span><strong style="color:#003168">Q4</strong>&nbsp;Aug&ndash;Oct</span>'
-        '</div>',
+        f'<div style="background:white;border-radius:10px;padding:.6rem 1.2rem;'
+        f'box-shadow:0 1px 5px rgba(0,0,0,.06);font-size:.8rem;color:#6B7280;'
+        f'display:flex;align-items:center;gap:0;margin-top:.4rem;flex-wrap:wrap;'
+        f'justify-content:space-between">'
+        f'<span style="display:flex;align-items:center;flex-wrap:wrap">{status_chips}</span>'
+        f'<span style="display:flex;align-items:center;gap:.7rem;flex-wrap:wrap">'
+        f'&#128197;&nbsp;<strong style="color:#003168">RBC FY&nbsp;Nov&ndash;Oct</strong>'
+        f'&nbsp;&nbsp;'
+        f'<span><strong style="color:#003168">Q1</strong>&nbsp;Nov&ndash;Jan</span>'
+        f'<span><strong style="color:#003168">Q2</strong>&nbsp;Feb&ndash;Apr</span>'
+        f'<span><strong style="color:#003168">Q3</strong>&nbsp;May&ndash;Jul</span>'
+        f'<span><strong style="color:#003168">Q4</strong>&nbsp;Aug&ndash;Oct</span>'
+        f'</span></div>',
         unsafe_allow_html=True,
     )
 
